@@ -45,3 +45,27 @@ jar {
     }
 }
 
+task shellScript {
+    dependsOn "jar"
+    doLast {
+        def base64 = new File("build/libs/git-commit-hook.jar").bytes.encodeBase64().toString().split("(?<=\\G.{100})").join("\n")
+        def outputJar = "commit-msg.jar"
+        new File("build/commit-msg").text = """#!/bin/sh
+
+JAR="`dirname \$0`/$outputJar"
+if [ ! -f "\$JAR" ]; then
+  echo "Extracting $outputJar"
+  awk '/^__BASE64__/ { P=1 ; next } { if ( P==1 ) print \$0 }' \$0 | base64 --decode > "\$JAR"
+  awk '/^__BASE64__/ { exit 0 } { print \$0 }' "\$0" > "\$0.tmp"
+  mv "\$0.tmp" "\$0"
+fi
+
+echo "Starting jar"
+java -jar "\$JAR" "\$@"
+
+exit 0
+
+__BASE64__
+""" + base64
+    }
+}
