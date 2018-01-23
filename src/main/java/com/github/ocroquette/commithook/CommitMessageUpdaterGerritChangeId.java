@@ -2,6 +2,11 @@ package com.github.ocroquette.commithook;
 
 import java.util.Random;
 
+/**
+ * Add a Change-Id footer line if not present
+ *
+ * The Change-Id is just a random string, it seems good enough in practice.
+ */
 public class CommitMessageUpdaterGerritChangeId implements CommitMessageUpdater {
     static private final String PREFIX = "Change-Id:";
 

@@ -8,8 +8,19 @@ import com.atlassian.util.concurrent.Promise;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
+/**
+ * Add information from Jira to the commit message.
+ *
+ * Jira issue ids are expected one per line at the start of the commit message, e.g.:
+ *
+ * ABC-123
+ * DEF-345
+ *
+ * Additional comment lines can be added below
+ */
 public class CommitMessageUpdaterJira implements CommitMessageUpdater {
     private final URI jiraUri;
     private final String username;
@@ -35,6 +46,7 @@ public class CommitMessageUpdaterJira implements CommitMessageUpdater {
 
         Collections.sort(ticketIds);
 
+        int longestTicketLength = ticketIds.stream().max(Comparator.comparingInt(String::length)).get().length();
 
         int insertAt = 0;
         if (ticketIds.size() > 1) {
@@ -43,15 +55,16 @@ public class CommitMessageUpdaterJira implements CommitMessageUpdater {
             insertAt = 2;
         }
         for (String ticketId : ticketIds) {
-            commitMessage.getTextLines().add(insertAt++, getIssueLine(ticketId));
+            commitMessage.getTextLines().add(insertAt++, getIssueLine(ticketId, longestTicketLength));
             String footerLine = "Jira-Id: " + ticketId;
             if (!commitMessage.getFooterLines().contains(footerLine))
                 commitMessage.getFooterLines().add(footerLine);
         }
     }
 
-    protected String getIssueLine(String ticketId) {
-        return String.format("%-16s%s", ticketId, getHeadline(ticketId));
+    protected String getIssueLine(String ticketId, int longestTicketLength) {
+        String format = "%-" + longestTicketLength + "s %s";
+        return String.format(format, ticketId, getHeadline(ticketId));
     }
 
     protected String getHeadline(String ticketId) {

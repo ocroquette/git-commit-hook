@@ -17,11 +17,14 @@ public class Main {
     final static String jiraPassword = "jira-password";
 
     public static void main(String[] args) throws URISyntaxException, IOException {
+        // The commit-message hook is called by Git with a single parameter, which is the file where the
+        // commit message is stored and should be overwritten with the new content
         File file = new File(args[0]);
 
         CommitMessage cm = new CommitMessage(readFile(file, StandardCharsets.UTF_8));
 
         new CommitMessageUpdaterJira(new URI(jiraUrl), jiraUsername, jiraPassword).update(cm);
+
         new CommitMessageUpdaterGerritChangeId().update(cm);
 
         writeFile(file, cm.generate());

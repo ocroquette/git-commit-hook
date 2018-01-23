@@ -15,7 +15,7 @@ class CommitMessageUpdaterJiraTest extends Specification {
         createInstance().update(cm)
         then:
         cm.getTextLines() == [
-                "SANDBOX-123     Headline of SANDBOX-123",
+                "SANDBOX-123 Headline of SANDBOX-123",
         ]
         cm.getFooterLines() == [
                 "Jira-Id: SANDBOX-123",
@@ -33,10 +33,10 @@ class CommitMessageUpdaterJiraTest extends Specification {
         cm.getTextLines() == [
                 "Issues ABC-999 JIRAPROJ-7890 SANDBOX-123 SANDBOX-456",
                 "",
-                "ABC-999         Headline of ABC-999",
-                "JIRAPROJ-7890   Headline of JIRAPROJ-7890",
-                "SANDBOX-123     Headline of SANDBOX-123",
-                "SANDBOX-456     Headline of SANDBOX-456",
+                "ABC-999       Headline of ABC-999",
+                "JIRAPROJ-7890 Headline of JIRAPROJ-7890",
+                "SANDBOX-123   Headline of SANDBOX-123",
+                "SANDBOX-456   Headline of SANDBOX-456",
                 "",
                 "Some comments after the tickets"
         ]
@@ -58,10 +58,10 @@ class CommitMessageUpdaterJiraTest extends Specification {
         cm.getTextLines() == [
                 "Issues ABC-999 JIRAPROJ-7890 SANDBOX-123 SANDBOX-456",
                 "",
-                "ABC-999         Headline of ABC-999",
-                "JIRAPROJ-7890   Headline of JIRAPROJ-7890",
-                "SANDBOX-123     Headline of SANDBOX-123",
-                "SANDBOX-456     Headline of SANDBOX-456",
+                "ABC-999       Headline of ABC-999",
+                "JIRAPROJ-7890 Headline of JIRAPROJ-7890",
+                "SANDBOX-123   Headline of SANDBOX-123",
+                "SANDBOX-456   Headline of SANDBOX-456",
                 "",
                 "Some comments after the tickets, but with a Change-Id"
         ]
