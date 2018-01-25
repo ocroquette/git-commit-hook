@@ -23,10 +23,9 @@ repositories {
 }
 
 dependencies {
-    // https://mvnrepository.com/artifact/com.atlassian.jira/jira-rest-java-client-core
-    compile group: 'com.atlassian.jira', name: 'jira-rest-java-client-core', version: '4.0.0'
-    compile "com.atlassian.fugue:fugue:2.2.1"
-    compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
+    compile "com.atlassian.jira:jira-rest-java-client-core:4.0.0"
+    compile "com.atlassian.fugue:fugue:2.2.1" // Dependency of jira-rest-java-client-core
+    compile "org.slf4j:slf4j-simple:1.7.25"
 
     testCompile "org.spockframework:spock-core:1.1-groovy-2.4"
     testCompile "org.hamcrest:hamcrest-core:1.3" // only necessary if Hamcrest matchers are used
@@ -40,13 +39,16 @@ jar {
     }
 
     from {
-        // Create fat JAR with all dependencies
-        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+        // We want the JAR to contain all dependencies (fat JAR)
+        configurations.compile.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
     }
 }
 
-task shellScript {
+task createShellScript {
     dependsOn "jar"
+    description "Create a shell script that contains the JAR file and extracts it on the first execution"
     doLast {
         def base64 = new File("build/libs/git-commit-hook.jar").bytes.encodeBase64().toString().split("(?<=\\G.{100})").join("\n")
         def outputJar = "commit-msg.jar"
@@ -55,12 +57,17 @@ task shellScript {
 JAR="`dirname \$0`/$outputJar"
 if [ ! -f "\$JAR" ]; then
   echo "Extracting $outputJar"
+
+  # Extract the JAR in a new file
   awk '/^__BASE64__/ { P=1 ; next } { if ( P==1 ) print \$0 }' \$0 | base64 --decode > "\$JAR"
+  
+  # Remove the embedded JAR from the script to save space, and possibly to improve future starting time of the script
+  # We use a temporary file to overwrite ourselves, otherwise the current execution will fail
   awk '/^__BASE64__/ { exit 0 } { print \$0 }' "\$0" > "\$0.tmp"
   mv "\$0.tmp" "\$0"
 fi
 
-echo "Starting jar"
+# echo "Starting jar"
 java -jar "\$JAR" "\$@"
 
 exit 0
