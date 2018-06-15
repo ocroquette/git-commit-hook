@@ -72,9 +72,9 @@ public class CommitMessageUpdaterJira implements CommitMessageUpdater {
         return issue.claim().getSummary();
     }
 
-    protected boolean isTicketId(String line) {
+    static boolean isTicketId(String line) {
         // Regexp from https://confluence.atlassian.com/stashkb/integrating-with-custom-jira-issue-key-313460921.html
-        return line.matches("((?<!([A-Z]{1,10})-?)[A-Z]+-\\d+)");
+        return line.matches("((?<!([A-Z0-9]{1,10})-?)[A-Z0-9]+-\\d+)");
     }
 
     protected JiraRestClient getRestClient() {

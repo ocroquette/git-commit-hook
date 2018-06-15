@@ -1,7 +1,5 @@
 package com.github.ocroquette.commithook
 
-import com.atlassian.jira.rest.client.api.domain.Issue
-import com.atlassian.util.concurrent.Promise
 import spock.lang.Specification
 
 class CommitMessageUpdaterJiraTest extends Specification {
@@ -9,7 +7,7 @@ class CommitMessageUpdaterJiraTest extends Specification {
 
     def "Single issue"() {
         given:
-        String input = this.getClass().getResource( '/commit-message-9.txt' ).text
+        String input = this.getClass().getResource('/commit-message-9.txt').text
         CommitMessage cm = new CommitMessage(input)
         when:
         createInstance().update(cm)
@@ -22,10 +20,24 @@ class CommitMessageUpdaterJiraTest extends Specification {
         ]
     }
 
+    def "Single issue with digits in the project id"() {
+        given:
+        String input = this.getClass().getResource('/commit-message-10.txt').text
+        CommitMessage cm = new CommitMessage(input)
+        when:
+        createInstance().update(cm)
+        then:
+        cm.getTextLines() == [
+                "SANDBOX12-123 Headline of SANDBOX12-123",
+        ]
+        cm.getFooterLines() == [
+                "Jira-Id: SANDBOX12-123",
+        ]
+    }
 
     def "Multiple issues"() {
         given:
-        String input = this.getClass().getResource( '/commit-message-6.txt' ).text
+        String input = this.getClass().getResource('/commit-message-6.txt').text
         CommitMessage cm = new CommitMessage(input)
         when:
         createInstance().update(cm)
@@ -50,7 +62,7 @@ class CommitMessageUpdaterJiraTest extends Specification {
 
     def "Multiple issues with Change-Id"() {
         given:
-        String input = this.getClass().getResource( '/commit-message-7.txt' ).text
+        String input = this.getClass().getResource('/commit-message-7.txt').text
         CommitMessage cm = new CommitMessage(input)
         when:
         createInstance().update(cm)
@@ -72,6 +84,21 @@ class CommitMessageUpdaterJiraTest extends Specification {
                 "Jira-Id: SANDBOX-123",
                 "Jira-Id: SANDBOX-456"
         ]
+    }
+
+    def "Identifying ticket IDs"() {
+        expect:
+        CommitMessageUpdaterJira.isTicketId(str) == expectedResult
+
+        where:
+        str             | expectedResult
+        "SANDBOX-1"     | true
+        "SANDBOX12-1"   | true
+        "abc"           | false
+        "abc-123"       | false
+        "SANDBOX12_1"   | false
+        " SANDBOX12-1"  | false
+
     }
 
     def createInstance() {
