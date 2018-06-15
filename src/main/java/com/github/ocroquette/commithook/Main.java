@@ -23,9 +23,7 @@ public class Main {
 
         CommitMessage cm = new CommitMessage(readFile(file, StandardCharsets.UTF_8));
 
-        new CommitMessageUpdaterJira(new URI(jiraUrl), jiraUsername, jiraPassword).update(cm);
-
-        new CommitMessageUpdaterGerritChangeId().update(cm);
+        new CommitMessageUpdaterBundle(new URI(jiraUrl), jiraUsername, jiraPassword).update(cm);
 
         writeFile(file, cm.generate());
     }

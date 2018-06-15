@@ -47,6 +47,7 @@ jar {
 }
 
 task createShellScript {
+    group "Custom"
     dependsOn "jar"
     description "Create a shell script that contains the JAR file and extracts it on the first execution"
     doLast {
@@ -65,6 +66,7 @@ if [ ! -f "\$JAR" ]; then
   # We use a temporary file to overwrite ourselves, otherwise the current execution will fail
   awk '/^__BASE64__/ { exit 0 } { print \$0 }' "\$0" > "\$0.tmp"
   mv "\$0.tmp" "\$0"
+  chmod +x "\$0"
 fi
 
 # echo "Starting jar"

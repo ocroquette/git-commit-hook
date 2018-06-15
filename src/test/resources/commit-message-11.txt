@@ -1,0 +1,17 @@
+This is a headline that is too long (length > 50 chars) and should issue a warning
+
+dummy001 dummy001 dummy001 dummy001 dummy001 dummy001 dummy001 dummy001
+dummy002 dummy002 dummy002 dummy002 dummy002 dummy002 dummy002 dummy002 dummy002
+
+dummy003 dummy003 dummy003 dummy003 dummy003 dummy003 dummy003 dummy003,dummy003
+
+dummy004 dummy004 dummy004 dummy004 dummy004 dummy004 dummy004 dummy004-dummy004
+
+dummy005 dummy005 dummy005 dummy005 dummy005 dummy005 dummy005 dummy005 dummy005 dummy005 dummy005 dummy005 dummy005 dummy005 dummy005 dummy005 dummy005 dummy005 dummy005 dummy005 dummy005 dummy005 dummy005 dummy005 dummy005 dummy005 dummy005
+
+dummy006dummy006dummy006dummy006dummy006dummy006dummy006dummy006dummy006dummy006dummy006dummy006dummy006dummy006dummy006dummy006dummy006dummy006dummy006dummy006dummy006dummy006dummy006
+dummy007dummy007dummy007dummy007dummy007dummy007dummy007dummy007dummy007dummy007dummy007dummy007dummy007dummy007dummy007dummy007dummy007dummy007dummy007dummy007dummy007dummy007dummy007dummy007dummy007dummy007dummy007:dummy007dummy007dummy007dummy007dummy007dummy007dummy007dummy007dummy007dummy007dummy007dummy007dummy007dummy007dummy007dummy007dummy007
+
+dummy008                                                                           dummy008
+
+Some-Footer-Tag: a looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooog value

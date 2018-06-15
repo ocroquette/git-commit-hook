@@ -10,15 +10,24 @@ public class CommitMessage {
     private final List<String> footerLines = new ArrayList<>();
     private static final String EOL = System.getProperty("line.separator");
     private static final Pattern FOOTER_LINE_PATTERN = Pattern.compile("([^:]+):\\s+(.*)");
+    private static final Pattern COMMENT_LINE_PATTERN = Pattern.compile("#.*");
+    private static final Pattern EMPTY_LINE_PATTERN = Pattern.compile("^\\s*$");
 
     public CommitMessage(String commitMessage) {
-        Pattern emptyLine = Pattern.compile("^\\s*$");
         String[] lines = commitMessage.split("\\r?\\n");
 
+        // Generate a string, in which each char represents the type of the line:
+        // empty (potential separator), potential footer line or normal text
+        // This string is used below to identify the real start and end of the
+        // footer
         String linesCategories = "";
         for ( int lineIndex = 0 ; lineIndex < lines.length ; lineIndex++) {
-            if ( emptyLine.matcher(lines[lineIndex]).matches() )
+            if ( EMPTY_LINE_PATTERN.matcher(lines[lineIndex]).matches() )
                 linesCategories += "E"; // EMPTY
+            else if ( COMMENT_LINE_PATTERN.matcher(lines[lineIndex]).matches() ) {
+                lines[lineIndex] = ""; // Remove comments
+                linesCategories += "E"; // Comment -> EMPTY
+            }
             else if ( FOOTER_LINE_PATTERN.matcher(lines[lineIndex]).matches() )
                 linesCategories += "F"; // FOOTER
             else
@@ -29,6 +38,9 @@ public class CommitMessage {
         int endOfText = -1;
         int startOfFooter = -1;
         int endOfFooter = -1;
+
+        // The footer is the last block of "F" preceeded by a separator,
+        // but only if there are some non empty lines before:
         if ( linesCategories.matches(".*[TF]EF+E*")) {
 
             endOfFooter = linesCategories.lastIndexOf("F");
