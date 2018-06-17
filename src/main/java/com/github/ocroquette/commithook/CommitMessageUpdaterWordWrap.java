@@ -42,9 +42,9 @@ public class CommitMessageUpdaterWordWrap implements CommitMessageUpdater {
         if (textLines.get(0).isEmpty())
             throw new RuntimeException("First line of commit message is empty");
         if (textLines.get(0).length() > MAX_LENGTH)
-            System.err.println("WARNING: first line of commit message is longer than the recommended " + MAX_LENGTH + " characters");
-        if (textLines.size() > 1 && ! textLines.get(1).matches("\\s*"))
-            System.err.println("WARNING: second line of commit message is not empty as it should be: " + textLines.get(1));
+            System.err.println("WARNING: first line of commit message is longer than the recommended " + MAX_LENGTH + " characters.");
+        if (textLines.size() > 1 && ! textLines.get(1).isEmpty())
+            System.err.println("WARNING: second line of commit message is not empty as it should be.");
     }
 
     private int getPotentialSplitIndex(String s) {

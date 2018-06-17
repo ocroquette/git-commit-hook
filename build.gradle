@@ -33,6 +33,14 @@ dependencies {
     testRuntime "org.objenesis:objenesis:2.5.1" // allows mocking of classes without default constructor (together with CGLIB)
 }
 
+def generatedResources = "$buildDir/generated-resources/main"
+
+sourceSets {
+    main {
+        output.dir(generatedResources, builtBy: 'generateJiraConfiguration')
+    }
+}
+
 jar {
     manifest {
         attributes "Main-Class": "com.github.ocroquette.commithook.Main"
@@ -42,6 +50,38 @@ jar {
         // We want the JAR to contain all dependencies (fat JAR)
         configurations.compile.collect {
             it.isDirectory() ? it : zipTree(it)
+        }
+    }
+}
+
+task generateJiraConfiguration {
+    description "Generate the property file with the configuration to access the Jira server"
+    group "build"
+    doLast {
+        def pkgName = "com.github.ocroquette.commithook"
+        def pkgPath = pkgName.replace(".", "/")
+        def propertyNames = [
+            "jiraUrl",
+            "jiraUser",
+            "jiraPassword",
+
+        ]
+        def propertyFile = file (generatedResources + "/" + pkgPath + "/jira.properties")
+        def props = new Properties()
+        def missingProperties  = []
+        propertyNames.each { propertyName ->
+            if(project.hasProperty(propertyName))
+                props.setProperty(propertyName, project.property(propertyName))
+            else {
+                props.setProperty(propertyName, "")
+                missingProperties.add(propertyName)
+            }
+        }
+        propertyFile.parentFile.mkdirs()
+        propertyFile.withWriter { props.store(it, "Generated from project properties") }
+        if(! missingProperties.isEmpty()) {
+            project.logger.warn("WARNING: following project properties are missing for Jira configuration: "
+                    + missingProperties.join(", "))
         }
     }
 }

@@ -14,7 +14,12 @@ public class CommitMessageUpdaterBundle implements CommitMessageUpdater {
     }
 
     public void update(CommitMessage commitMessage) {
-        new CommitMessageUpdaterJira(jiraUri, jiraUsername, jiraPassword).update(commitMessage);
+        if( jiraUri.toString().isEmpty() || jiraUsername.isEmpty() || jiraPassword.isEmpty()) {
+            System.err.println("WARNING: Jira configuration is incomplete, skipping processing of Jira tickets in commit message");
+        }
+        else {
+            new CommitMessageUpdaterJira(jiraUri, jiraUsername, jiraPassword).update(commitMessage);
+        }
 
         new CommitMessageUpdaterGerritChangeId().update(commitMessage);
 

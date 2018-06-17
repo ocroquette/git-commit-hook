@@ -1,15 +1,13 @@
 package com.github.ocroquette.commithook;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Properties;
 
 public class Main {
     final static String jiraUrl = "https://jira.company.com";
@@ -23,7 +21,16 @@ public class Main {
 
         CommitMessage cm = new CommitMessage(readFile(file, StandardCharsets.UTF_8));
 
-        new CommitMessageUpdaterBundle(new URI(jiraUrl), jiraUsername, jiraPassword).update(cm);
+        Properties jiraProperties = getJiraProperties();
+        URI jiraUri = (jiraProperties.getProperty("jiraUrl") != null ?
+                new URI(jiraProperties.getProperty("jiraUrl"))
+                : null);
+
+        new CommitMessageUpdaterBundle(
+                jiraUri,
+                jiraProperties.getProperty("jiraUser"),
+                jiraProperties.getProperty("jiraPassword")
+        ).update(cm);
 
         writeFile(file, cm.generate());
     }
@@ -34,8 +41,25 @@ public class Main {
     }
 
     static void writeFile(File file, String content) throws FileNotFoundException {
-        try(  PrintWriter out = new PrintWriter( file)  ){
-            out.print( content);
+        try (PrintWriter out = new PrintWriter(file)) {
+            out.print(content);
         }
+    }
+
+    static Properties getJiraProperties() {
+        Properties properties = new Properties();
+        InputStream in = Main.class.getResourceAsStream("jira.properties");
+        try {
+            properties.load(in);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+        try {
+            in.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return properties;
     }
 }
