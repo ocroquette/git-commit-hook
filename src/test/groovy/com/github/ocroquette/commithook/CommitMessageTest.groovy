@@ -56,4 +56,23 @@ class CommitMessageTest extends Specification {
         cm.getFooterLines() == []
     }
 
+    def "Parse commit-message-13.txt"() {
+        given:
+        String input = this.getClass().getResource( '/commit-message-13.txt' ).text
+        when:
+        CommitMessage cm = new CommitMessage(input)
+        then:
+        cm.getTextLines() == ["blabla blabla blabla blabla blabla blabla blabla", "Change-Id: Id88c2af9e04dad15cafc830717a8b0e8042c3d87"]
+        cm.getFooterLines() == []
+    }
+
+    def "Parse commit-message-14.txt"() {
+        given:
+        String input = this.getClass().getResource( '/commit-message-14.txt' ).text
+        when:
+        CommitMessage cm = new CommitMessage(input)
+        then:
+        cm.getTextLines() == ["headline", "", "blabla blabla blabla blabla blabla blabla blabla", "Change-Id: Id88c2af9e04dad15cafc830717a8b0e8042c3d87"]
+        cm.getFooterLines() == []
+    }
 }
