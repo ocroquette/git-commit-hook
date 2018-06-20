@@ -44,6 +44,6 @@ Change-Id: Id88c2af9e04dad15cafc830717a8b0e8042c3d87""")
     }
 
     def createInstance() {
-        return new CommitMessageUpdaterBundle(null, null, null)
+        return new CommitMessageUpdaterBundle(new URI(""), "", "")
     }
 }
