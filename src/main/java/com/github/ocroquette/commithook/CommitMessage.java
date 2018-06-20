@@ -55,7 +55,20 @@ public class CommitMessage {
             endOfText = Math.max(linesCategories.lastIndexOf("T"),linesCategories.lastIndexOf("F"));
         }
 
-        this.textLines.addAll(new ArrayList<>(Arrays.asList(Arrays.copyOfRange(lines, startOfText, endOfText+1))));
+        try {
+            this.textLines.addAll(new ArrayList<>(Arrays.asList(Arrays.copyOfRange(lines, startOfText, endOfText + 1))));
+        }
+        catch(ArrayIndexOutOfBoundsException e) {
+            // This has been seen in the field, but the cause is not clear.
+            System.err.println("Internal error: ArrayIndexOutOfBoundsException. Please report this error.");
+            System.err.println("                linesCategories = "+linesCategories);
+            System.err.println("                startOfText     = "+startOfText);
+            System.err.println("                endOfText       = "+endOfText);
+            System.err.println("                startOfFooter   = "+startOfFooter);
+            System.err.println("                endOfFooter     = "+endOfFooter);
+            System.err.println("                commitMessage   = \n\""+commitMessage + "\"");
+            System.exit(1);
+        }
         if ( startOfFooter > 0 )
             this.footerLines.addAll(new ArrayList<>(Arrays.asList(Arrays.copyOfRange(lines, startOfFooter, endOfFooter+1))));
     }
