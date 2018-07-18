@@ -75,4 +75,13 @@ class CommitMessageTest extends Specification {
         cm.getTextLines() == ["headline", "", "blabla blabla blabla blabla blabla blabla blabla", "Change-Id: Id88c2af9e04dad15cafc830717a8b0e8042c3d87"]
         cm.getFooterLines() == []
     }
+    def "Parse commit-message-15.txt"() {
+        given:
+        String input = this.getClass().getResource( '/commit-message-15.txt' ).text
+        when:
+        CommitMessage cm = new CommitMessage(input)
+        then:
+        cm.getTextLines() == ["Introduced syntax error", ""]
+        cm.getFooterLines() == ["Change-Id: Iee5559fbee98decbf54b03509e72a6fc1a0d24e6"]
+    }
 }

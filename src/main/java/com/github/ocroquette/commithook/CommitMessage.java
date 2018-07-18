@@ -41,7 +41,7 @@ public class CommitMessage {
 
         // The footer is the last block of "F" preceeded by a separator,
         // but only if there are some non empty lines before:
-        if ( linesCategories.matches(".*[TF]EF+E*")) {
+        if ( linesCategories.matches(".*[TF]E+F+E*")) {
 
             endOfFooter = linesCategories.lastIndexOf("F");
             startOfFooter = linesCategories.lastIndexOf("E", endOfFooter) + 1;
