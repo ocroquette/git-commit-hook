@@ -12,7 +12,7 @@ class CommitMessageUpdaterGerritChangeIdTest extends Specification {
         when:
         new CommitMessageUpdaterGerritChangeId().update(cm)
         then:
-        cm.getTextLines() == ["Introduced syntax error"]
+        cm.getTextLines() == ["Bla: Introduced syntax error"]
         cm.getFooterLines().size() == 1
         cm.getFooterLines().get(0).matches('Change-Id: Iee5559fbee98decbf54b03509e72a6fc1a0d24e6')
     }

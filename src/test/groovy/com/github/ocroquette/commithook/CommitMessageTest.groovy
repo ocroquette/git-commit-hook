@@ -12,7 +12,7 @@ class CommitMessageTest extends Specification {
         when:
         CommitMessage cm = new CommitMessage(input)
         then:
-        cm.getTextLines() == ["Introduced syntax error"]
+        cm.getTextLines() == ["Bla: Introduced syntax error"]
         cm.getFooterLines() == ["Change-Id: Iee5559fbee98decbf54b03509e72a6fc1a0d24e6"]
     }
 

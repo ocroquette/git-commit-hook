@@ -47,7 +47,7 @@ public class CommitMessage {
             startOfFooter = linesCategories.lastIndexOf("E", endOfFooter) + 1;
 
             // Footer found
-            startOfText = Math.min(linesCategories.indexOf("T"),linesCategories.indexOf("F"));
+            startOfText = minIndex(linesCategories.indexOf("T"),linesCategories.indexOf("F"));
             endOfText = linesCategories.lastIndexOf("E", endOfFooter) - 1;
         }
         else {
@@ -83,6 +83,19 @@ public class CommitMessage {
         else {
             return String.join(EOL, textLines) + EOL + EOL + String.join(EOL, footerLines);
         }
+    }
+
+    private int minIndex(int index1, int index2) {
+        if (index1 < 0) {
+            if (index2 < 0) {
+                throw new RuntimeException("Both indices are negative");
+            }
+            return index2;
+        }
+        else if (index2 < -1) {
+            return index1;
+        }
+        return Math.min(index1, index2);
     }
 
     public List<String> getFooterLines() {
