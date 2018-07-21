@@ -96,21 +96,19 @@ task createShellScript {
         new File("build/commit-msg").text = """#!/bin/sh
 
 JAR="`dirname \$0`/$outputJar"
-if [ ! -f "\$JAR" ]; then
-  echo "Extracting $outputJar"
 
-  # Extract the JAR in a new file
-  awk '/^__BASE64__/ { P=1 ; next } { if ( P==1 ) print \$0 }' \$0 | base64 --decode > "\$JAR"
-  
-  # Remove the embedded JAR from the script to save space, and possibly to improve future starting time of the script
-  # We use a temporary file to overwrite ourselves, otherwise the current execution will fail
-  awk '/^__BASE64__/ { exit 0 } { print \$0 }' "\$0" > "\$0.tmp"
-  mv "\$0.tmp" "\$0"
-  chmod +x "\$0"
-fi
+# Extract the JAR
+echo "Extracting $outputJar"
+awk '/^__BASE64__/ { P=1 ; next } { if ( P==1 ) print \$0 }' \$0 | base64 --decode > "\$JAR"
 
-# echo "Starting jar"
-java -jar "\$JAR" "\$@"
+# Replace the extracting script by the starting script
+(
+    echo "#!/bin/sh"
+    echo 'java -jar "`dirname \$0`/$outputJar" "\$@"'
+) > "\$0.tmp"
+mv "\$0.tmp" "\$0"
+chmod +x "\$0"
+exec "\$0" "\$@"
 
 exit 0
 
