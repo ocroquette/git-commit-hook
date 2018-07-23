@@ -12,7 +12,6 @@ class CommitMessageUpdaterWordWrapTest extends Specification {
         when:
         createInstance().update(cm)
         def lines = cm.getTextLines()
-        def i = 0
         then:
         TestHelper.compareLines(lines,
         """This is a headline that is too long (length > 50 chars) and should issue a warning
@@ -42,6 +41,25 @@ dummy008
         cm.getFooterLines() == [
                 "Some-Footer-Tag: a looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooog value",
         ]
+    }
+
+    def "Word wrap commit-message-with-long-link.txt"() {
+        given:
+        String input = this.getClass().getResource( '/commit-message-with-long-link.txt' ).text
+        CommitMessage cm = new CommitMessage(input)
+        when:
+        createInstance().update(cm)
+        def lines = cm.getTextLines()
+        then:
+        TestHelper.compareLines(lines,
+                """Introduced syntax error
+
+This is the link: 
+http://www.loooooooooooooooooooooooo.com/loooooooooooooooooooogpath/%E0%B9%82%E0.php?arg1=loooooooooooooooooooooooooooooooarg#looooooooooooooooooganchor 
+Check it out!
+
+Change-Id: Iee5559fbee98decbf54b03509e72a6fc1a0d24e6
+""")
     }
 
     def createInstance() {

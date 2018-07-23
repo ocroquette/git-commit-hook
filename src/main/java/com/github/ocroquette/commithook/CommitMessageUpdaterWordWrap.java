@@ -19,6 +19,8 @@ public class CommitMessageUpdaterWordWrap implements CommitMessageUpdater {
             }
     ));
 
+    private static final String LINK_PREFIX = "[a-z]://.*";
+
     public void update(CommitMessage commitMessage) {
         List<String> textLines = commitMessage.getTextLines();
         checkFirstLines(commitMessage);
@@ -48,19 +50,33 @@ public class CommitMessageUpdaterWordWrap implements CommitMessageUpdater {
     }
 
     private int getPotentialSplitIndex(String s) {
+        List<Integer> breakPoints = new ArrayList<>();
+
+        System.out.println("getPotentialSplitIndex " + s);
+
+        boolean inLink = false;
+        for(int i = 1; i < s.length() ; i++) {
+            if(s.substring(i).matches(LINK_PREFIX)) {
+                inLink = true;
+                continue;
+            }
+            if (inLink && s.substring(i, i+1).matches("\\s"))
+                inLink = false;
+            if(inLink)
+                continue;
+            if(SEPARATORS.contains(s.charAt(i)))
+                breakPoints.add(i);
+        }
+
+        if(breakPoints.size() == 0 )
+            return -1;
+
         // Try to split so that the first line is short enough
-        for(int i = MAX_LENGTH - 1; i > 0 ; i--) {
-            if( SEPARATORS.contains(s.charAt(i)) ) {
-                return i;
-            }
-        }
+        for (int index = breakPoints.size()-1 ; index > 0 ; index--)
+            if(breakPoints.get(index)  < MAX_LENGTH)
+                return breakPoints.get(index);
+
         // Plan B: try to have first line as short as possible
-        for(int i = MAX_LENGTH + 1; i < s.length() ; i++) {
-            if( SEPARATORS.contains(s.charAt(i)) ) {
-                return i;
-            }
-        }
-        // Line too long but no separator found
-        return -1;
+        return breakPoints.get(0);
     }
 }
