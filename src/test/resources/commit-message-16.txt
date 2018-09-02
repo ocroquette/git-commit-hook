@@ -1,0 +1,3 @@
+the following line should not be considered as footer: lowercase 1st char
+
+test: xxx

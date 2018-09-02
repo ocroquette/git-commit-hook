@@ -84,4 +84,13 @@ class CommitMessageTest extends Specification {
         cm.getTextLines() == ["Introduced syntax error", ""]
         cm.getFooterLines() == ["Change-Id: Iee5559fbee98decbf54b03509e72a6fc1a0d24e6"]
     }
+    def "Parse commit-message-16.txt"() {
+        given:
+        String input = this.getClass().getResource( '/commit-message-16.txt' ).text
+        when:
+        CommitMessage cm = new CommitMessage(input)
+        then:
+        cm.getTextLines() == ["the following line should not be considered as footer: lowercase 1st char", "", "test: xxx"]
+        cm.getFooterLines() == []
+    }
 }

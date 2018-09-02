@@ -9,7 +9,7 @@ public class CommitMessage {
     private final List<String> textLines = new ArrayList<>();
     private final List<String> footerLines = new ArrayList<>();
     private static final String EOL = System.getProperty("line.separator");
-    private static final Pattern FOOTER_LINE_PATTERN = Pattern.compile("([A-Za-z0-9_\\-]+)\\s*:\\s+(.*)");
+    private static final Pattern FOOTER_LINE_PATTERN = Pattern.compile("([A-Z][A-Za-z0-9_\\-]+)\\s*:\\s+(.*)");
     private static final Pattern COMMENT_LINE_PATTERN = Pattern.compile("#.*");
     private static final Pattern EMPTY_LINE_PATTERN = Pattern.compile("^\\s*$");
 
