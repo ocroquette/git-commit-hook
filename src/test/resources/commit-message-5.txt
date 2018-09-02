@@ -1,6 +1,6 @@
 Introduced syntax error
 
-I am a bad person, therefore I introduce bugs in the projects I have access to. In this case,
+I am a bad person, therefore I introduce bugs in the projects I have access to: in this case,
 I have introduced a syntax error.
 
 

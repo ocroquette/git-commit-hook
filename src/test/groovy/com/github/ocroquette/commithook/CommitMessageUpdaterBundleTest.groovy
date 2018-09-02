@@ -39,7 +39,7 @@ nunc,
 
 Change-Id: Id88c2af9e04dad15cafc830717a8b0e8042c3d87""")
         cm.getFooterLines() == [
-                "Change-Id: Id88c2af9e04dad15cafc830717a8b0e8042c3d87",
+                "Change-Id: Id88c2af9e04dad15cafc830717a8b0e8042c3d87"
         ]
     }
 

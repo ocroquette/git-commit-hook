@@ -24,7 +24,7 @@ class CommitMessageUpdaterGerritChangeIdTest extends Specification {
         when:
         new CommitMessageUpdaterGerritChangeId().update(cm)
         then:
-        cm.getTextLines() == ["Introduced syntax error","", "I am a bad person, therefore I introduce bugs in the projects I have access to. In this case,","I have introduced a syntax error."]
+        cm.getTextLines() == ["Introduced syntax error","", "I am a bad person, therefore I introduce bugs in the projects I have access to: in this case,","I have introduced a syntax error."]
         cm.getFooterLines().size() == 1
         cm.getFooterLines().get(0).matches('Change-Id: I[0-9a-f]{40}')
     }
