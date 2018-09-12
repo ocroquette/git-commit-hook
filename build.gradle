@@ -108,7 +108,7 @@ awk '/^__BASE64__/ { P=1 ; next } { if ( P==1 ) print \$0 }' \$0 | base64 --deco
 ) > "\$0.tmp"
 mv "\$0.tmp" "\$0"
 chmod +x "\$0"
-exec "\$0" "\$@"
+java -jar "`dirname \$0`/$outputJar" "\$@"
 
 exit 0
 
