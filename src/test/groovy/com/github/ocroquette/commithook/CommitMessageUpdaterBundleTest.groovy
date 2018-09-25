@@ -13,7 +13,7 @@ class CommitMessageUpdaterBundleTest extends Specification {
         def i = 0
         then:
         TestHelper.compareLines(cm.getTextLines(),
-                """blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla
+                """This is a headline that is very long, it should issue a warning but not be wrapped, since the first light should never never never never never never never never never never never never be touched
 
 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean
 commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus
