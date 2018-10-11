@@ -99,6 +99,14 @@ public class CommitMessage {
     }
 
     public List<String> getFooterLines() {
-        return footerLines;
+        List<String> copy = new ArrayList<>();
+        copy.addAll(footerLines);
+        return copy;
     }
+
+    public void setFooterLines(List<String> lines) {
+        this.footerLines.clear();
+        this.footerLines.addAll(lines);
+    }
+
 }

@@ -25,5 +25,7 @@ public class CommitMessageUpdaterBundle implements CommitMessageUpdater {
 
         new CommitMessageUpdaterWordWrap().update(commitMessage);
 
+        new CommitMessageUpdaterSortFooterLines().update(commitMessage);
+
     }
 }

@@ -43,6 +43,26 @@ Change-Id: Id88c2af9e04dad15cafc830717a8b0e8042c3d87""")
         ]
     }
 
+    def "Sort footer lines"() {
+        given:
+        String input = this.getClass().getResource('/commit-message-sort-footer.txt').text
+        CommitMessage cm = new CommitMessage(input)
+        when:
+        createInstance().update(cm)
+        def lines = cm.getTextLines()
+        def i = 0
+        then:
+        TestHelper.compareLines(cm.getTextLines(),
+                """Headline""")
+        cm.getFooterLines() == [
+                "Abc-def: 1",
+                "Abc-def: 2",
+                "Ccc-Zzz: 1",
+                "Change-Id: Iee5559fbee98decbf54b03509e72a6fc1a0d24e6"
+
+        ]
+    }
+
     def createInstance() {
         return new CommitMessageUpdaterBundle(new URI(""), "", "")
     }
