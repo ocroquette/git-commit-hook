@@ -104,6 +104,10 @@ public class CommitMessage {
         return copy;
     }
 
+    public void appendFooterLine(String line) {
+        footerLines.add(line);
+    }
+
     public void setFooterLines(List<String> lines) {
         this.footerLines.clear();
         this.footerLines.addAll(lines);

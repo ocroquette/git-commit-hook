@@ -58,7 +58,7 @@ public class CommitMessageUpdaterJira implements CommitMessageUpdater {
             commitMessage.getTextLines().add(insertAt++, getIssueLine(ticketId, longestTicketLength));
             String footerLine = "Jira-Id: " + ticketId;
             if (!commitMessage.getFooterLines().contains(footerLine))
-                commitMessage.getFooterLines().add(footerLine);
+                commitMessage.appendFooterLine(footerLine);
         }
     }
 

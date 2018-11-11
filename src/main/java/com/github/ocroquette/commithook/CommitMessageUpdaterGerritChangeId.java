@@ -16,7 +16,7 @@ public class CommitMessageUpdaterGerritChangeId implements CommitMessageUpdater 
 
     public void update(CommitMessage commitMessage) {
         if ( ! hasChangeId(commitMessage) ) {
-            commitMessage.getFooterLines().add(PREFIX + " I" + generateChangeId());
+            commitMessage.appendFooterLine(PREFIX + " I" + generateChangeId());
         }
     }
 
