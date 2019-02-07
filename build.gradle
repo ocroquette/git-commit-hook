@@ -29,8 +29,8 @@ dependencies {
 
     testCompile "org.spockframework:spock-core:1.1-groovy-2.4"
     testCompile "org.hamcrest:hamcrest-core:1.3" // only necessary if Hamcrest matchers are used
-    testRuntime "net.bytebuddy:byte-buddy:1.6.5"          // allows mocking of classes (in addition to interfaces)
-    testRuntime "org.objenesis:objenesis:2.5.1" // allows mocking of classes without default constructor (together with CGLIB)
+    testRuntime "net.bytebuddy:byte-buddy:1.6.5" // allows mocking of classes (in addition to interfaces)
+    testRuntime "org.objenesis:objenesis:2.5.1"  // allows mocking of classes without default constructor
 }
 
 def generatedResources = "$buildDir/generated-resources/main"
@@ -61,16 +61,17 @@ task generateJiraConfiguration {
         def pkgName = "com.github.ocroquette.commithook"
         def pkgPath = pkgName.replace(".", "/")
         def propertyNames = [
-            "jiraUrl",
-            "jiraUser",
-            "jiraPassword",
-
+                "jiraUrl",
+                "jiraUser",
+                "jiraPassword",
+                "wrapLength"
         ]
-        def propertyFile = file (generatedResources + "/" + pkgPath + "/jira.properties")
+        def propertyFile = file(generatedResources + "/" + pkgPath + "/settings.properties")
         def props = new Properties()
-        def missingProperties  = []
+        def missingProperties = []
         propertyNames.each { propertyName ->
-            if(project.hasProperty(propertyName))
+            // Read the project properties from Gradle and save them in $generatedResources/jira.properties
+            if (project.hasProperty(propertyName))
                 props.setProperty(propertyName, project.property(propertyName))
             else {
                 props.setProperty(propertyName, "")
@@ -79,8 +80,8 @@ task generateJiraConfiguration {
         }
         propertyFile.parentFile.mkdirs()
         propertyFile.withWriter { props.store(it, "Generated from project properties") }
-        if(! missingProperties.isEmpty()) {
-            project.logger.warn("WARNING: following project properties are missing for Jira configuration: "
+        if (!missingProperties.isEmpty()) {
+            project.logger.warn("WARNING: following project properties are not set for configuration: "
                     + missingProperties.join(", "))
         }
     }

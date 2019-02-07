@@ -102,7 +102,7 @@ class CommitMessageUpdaterJiraTest extends Specification {
     }
 
     def createInstance() {
-        return new CommitMessageUpdaterJira(null, null, null) {
+        return new CommitMessageUpdaterJira(new CommitMessageUpdaterJira.JiraSettings(null, null, null)) {
             @Override
             protected String getHeadline(String ticketId) {
                 return "Headline of " + ticketId;

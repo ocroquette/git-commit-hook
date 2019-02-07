@@ -8,7 +8,15 @@ import java.util.regex.Pattern;
  * Wraps the text automatically
  */
 public class CommitMessageUpdaterWordWrap implements CommitMessageUpdater {
-    static final int MAX_LENGTH = 72;
+
+    static public class WordWrapSettings {
+        WordWrapSettings(int wrapLength) {
+            this.wrapLength = wrapLength;
+        }
+        public final int wrapLength;
+    }
+
+    private final WordWrapSettings wordWrapSettings;
 
     private static final Set<Character> SEPARATORS = new HashSet<Character>(Arrays.asList(
             new Character[] {
@@ -21,11 +29,22 @@ public class CommitMessageUpdaterWordWrap implements CommitMessageUpdater {
             }
     ));
 
+
     private static final String LINK_PREFIX = "[a-z]://.*";
 
     private String indentString = "";
 
+    public CommitMessageUpdaterWordWrap(WordWrapSettings wordWrapSettings) {
+        this.wordWrapSettings = wordWrapSettings;
+    }
+
     public void update(CommitMessage commitMessage) {
+
+        if(getWrapLength() <= 0) {
+            // Disabled
+            return;
+        }
+
         List<String> textLines = commitMessage.getTextLines();
         checkFirstLines(commitMessage);
         final Pattern spaces = Pattern.compile("(\\s*).*");
@@ -39,7 +58,7 @@ public class CommitMessageUpdaterWordWrap implements CommitMessageUpdater {
                     indentString = matcher.group(1);
             }
             isOriginalLine = true;
-            if (line.length()> MAX_LENGTH) {
+            if (line.length()> getWrapLength()) {
                 int splitIndex = getPotentialSplitIndex(line, indentString.length());
                 if (splitIndex != -1) {
                     textLines.remove(lineIndex);
@@ -62,8 +81,8 @@ public class CommitMessageUpdaterWordWrap implements CommitMessageUpdater {
             throw new RuntimeException("Empty text in commit message");
         if (textLines.get(0).isEmpty())
             throw new RuntimeException("First line of commit message is empty");
-        if (textLines.get(0).length() > MAX_LENGTH)
-            System.err.println("WARNING: first line of commit message is longer than the recommended " + MAX_LENGTH + " characters.");
+        if (textLines.get(0).length() > getWrapLength())
+            System.err.println("WARNING: first line of commit message is longer than the recommended " + getWrapLength() + " characters.");
         if (textLines.size() > 1 && ! textLines.get(1).isEmpty())
             System.err.println("WARNING: second line of commit message is not empty as it should be.");
     }
@@ -90,10 +109,14 @@ public class CommitMessageUpdaterWordWrap implements CommitMessageUpdater {
 
         // Try to split so that the first line is short enough
         for (int index = breakPoints.size()-1 ; index > 0 ; index--)
-            if(breakPoints.get(index)  < MAX_LENGTH - indentLength)
+            if(breakPoints.get(index)  < getWrapLength() - indentLength)
                 return breakPoints.get(index);
 
         // Plan B: try to have first line as short as possible
         return breakPoints.get(0);
+    }
+
+    private int getWrapLength() {
+        return wordWrapSettings.wrapLength;
     }
 }

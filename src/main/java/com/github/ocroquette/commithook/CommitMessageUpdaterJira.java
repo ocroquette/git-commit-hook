@@ -22,16 +22,22 @@ import java.util.List;
  * Additional comment lines can be added below
  */
 public class CommitMessageUpdaterJira implements CommitMessageUpdater {
-    private final URI jiraUri;
-    private final String username;
-    private final String password;
+    static public class JiraSettings {
+        JiraSettings(URI uri, String username, String password) {
+            this.uri = uri;
+            this.username = username;
+            this.password = password;
+        }
+        public final URI uri;
+        public final String username;
+        public final String password;
+    }
 
     private JiraRestClient restClient;
+    private final JiraSettings jiraSettings;
 
-    public CommitMessageUpdaterJira(URI jiraUri, String username, String password) {
-        this.jiraUri = jiraUri;
-        this.username = username;
-        this.password = password;
+    public CommitMessageUpdaterJira(JiraSettings jiraSettings) {
+        this.jiraSettings = jiraSettings;
     }
 
     @Override
@@ -79,7 +85,8 @@ public class CommitMessageUpdaterJira implements CommitMessageUpdater {
 
     protected JiraRestClient getRestClient() {
         if (restClient == null)
-            restClient = new AsynchronousJiraRestClientFactory().createWithBasicHttpAuthentication(jiraUri, username, password);
+            restClient = new AsynchronousJiraRestClientFactory().createWithBasicHttpAuthentication(
+                    jiraSettings.uri, jiraSettings.username, jiraSettings.password);
         return restClient;
     }
 }

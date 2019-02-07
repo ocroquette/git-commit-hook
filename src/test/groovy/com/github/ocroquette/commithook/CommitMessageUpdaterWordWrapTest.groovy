@@ -94,6 +94,6 @@ Change-Id: Iee5559fbee98decbf54b03509e72a6fc1a0d24e6
     }
 
     def createInstance() {
-        return new CommitMessageUpdaterWordWrap();
+        return new CommitMessageUpdaterWordWrap(new CommitMessageUpdaterWordWrap.WordWrapSettings(72));
     }
 }

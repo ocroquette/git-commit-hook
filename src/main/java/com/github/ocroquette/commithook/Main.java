@@ -21,15 +21,9 @@ public class Main {
 
         CommitMessage cm = new CommitMessage(readFile(file, StandardCharsets.UTF_8));
 
-        Properties jiraProperties = getJiraProperties();
-        URI jiraUri = (jiraProperties.getProperty("jiraUrl") != null ?
-                new URI(jiraProperties.getProperty("jiraUrl"))
-                : null);
-
         new CommitMessageUpdaterBundle(
-                jiraUri,
-                jiraProperties.getProperty("jiraUser"),
-                jiraProperties.getProperty("jiraPassword")
+                getJiraSettings(),
+                getWordWrapSettings()
         ).update(cm);
 
         writeFile(file, cm.generate());
@@ -46,20 +40,51 @@ public class Main {
         }
     }
 
-    static Properties getJiraProperties() {
+    static Properties getSettingsProperties() {
         Properties properties = new Properties();
-        InputStream in = Main.class.getResourceAsStream("jira.properties");
+        InputStream in = Main.class.getResourceAsStream("settings.properties");
         try {
             properties.load(in);
         } catch (IOException e) {
+            // Don't throw an exception, we will use the default values
             e.printStackTrace();
             return null;
         }
         try {
             in.close();
         } catch (IOException e) {
+            // Nothing we can do about this
             e.printStackTrace();
         }
         return properties;
+    }
+
+    static CommitMessageUpdaterJira.JiraSettings getJiraSettings() throws URISyntaxException {
+        Properties properties = getSettingsProperties();
+        URI jiraUri = (properties.getProperty("jiraUrl") != null ?
+                new URI(properties.getProperty("jiraUrl"))
+                : null);
+
+        return new CommitMessageUpdaterJira.JiraSettings(
+                jiraUri,
+                properties.getProperty("jiraUser"),
+                properties.getProperty("jiraPassword"));
+    }
+
+    static CommitMessageUpdaterWordWrap.WordWrapSettings getWordWrapSettings() throws URISyntaxException {
+        Properties properties = getSettingsProperties();
+
+        final int defaultWrapLength = 79;
+        int wrapLength;
+        String wrapLengthPropertyValue = properties.getProperty("wrapLength");
+        if (wrapLengthPropertyValue == null || wrapLengthPropertyValue.isEmpty()) {
+            wrapLength = defaultWrapLength;
+        }
+        else {
+            // will throw an unchecked exception if the string cannot be parsed as integer
+            wrapLength = Integer.parseInt(wrapLengthPropertyValue);
+        }
+
+        return new CommitMessageUpdaterWordWrap.WordWrapSettings(wrapLength);
     }
 }

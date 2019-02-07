@@ -138,8 +138,14 @@ The hook is provided in source code form only. It is designed to make adaptation
 You need in any case to build your own version containing the parameters of your Jira server. To build the hook, use Gradle:
 
 ```
-gradlew  -PjiraUrl=http://replaceme.invalid  -PjiraUser=username  -PjiraPassword=password  createShellScript
+gradlew  -Pparameter=value  createShellScript
 ```
+
+Follow parameters are supported:
+* jiraUrl: the URL of the Jira server, for instance http://replaceme.invalid
+* jiraUser: the user name to authenticate against the Jira server
+* jiraPassword: the password of the Jira user
+* wrapLength: the length of the lines for word wrapping (default is 79)
 
 This will generate the ```build/commit-msg``` shell script, which has two functions: extract the embedded JAR file on the first execution, and start the JAR on every execution. Put this script in your Git repository in the subdirectory ```.git/hooks```:
 
