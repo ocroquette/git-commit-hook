@@ -86,6 +86,24 @@ class CommitMessageUpdaterJiraTest extends Specification {
         ]
     }
 
+    def "Handle exceptions nicely"() {
+        given:
+        String input = "ABC-123\n\nHello"
+        CommitMessage cm = new CommitMessage(input)
+        when:
+        createBrokenInstance().update(cm)
+        then:
+        cm.getTextLines() == [
+                "ABC-123 ERROR: java.lang.RuntimeException: Fake error while retrieving: ABC-123",
+                "",
+                "Hello",
+        ]
+        cm.getFooterLines() == [
+                "Jira-Id: ABC-123",
+        ]
+
+    }
+
     def "Identifying ticket IDs"() {
         expect:
         CommitMessageUpdaterJira.isTicketId(str) == expectedResult
@@ -106,6 +124,15 @@ class CommitMessageUpdaterJiraTest extends Specification {
             @Override
             protected String getHeadline(String ticketId) {
                 return "Headline of " + ticketId;
+            }
+        }
+    }
+
+    def createBrokenInstance() {
+        return new CommitMessageUpdaterJira(new CommitMessageUpdaterJira.JiraSettings(null, null, null)) {
+            @Override
+            protected String getHeadlineUnsafe(String ticketId) {
+                throw new RuntimeException("Fake error while retrieving: " + ticketId)
             }
         }
     }

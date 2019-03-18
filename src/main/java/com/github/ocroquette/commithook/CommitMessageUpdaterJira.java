@@ -13,12 +13,12 @@ import java.util.List;
 
 /**
  * Add information from Jira to the commit message.
- *
+ * <p>
  * Jira issue ids are expected one per line at the start of the commit message, e.g.:
- *
+ * <p>
  * ABC-123
  * DEF-345
- *
+ * <p>
  * Additional comment lines can be added below
  */
 public class CommitMessageUpdaterJira implements CommitMessageUpdater {
@@ -28,6 +28,7 @@ public class CommitMessageUpdaterJira implements CommitMessageUpdater {
             this.username = username;
             this.password = password;
         }
+
         public final URI uri;
         public final String username;
         public final String password;
@@ -74,6 +75,15 @@ public class CommitMessageUpdaterJira implements CommitMessageUpdater {
     }
 
     protected String getHeadline(String ticketId) {
+        try {
+            return getHeadlineUnsafe(ticketId);
+        } catch (Throwable e) {
+            e.printStackTrace(); // print full error on the console for the user
+            return "ERROR: " + e.toString();
+        }
+    }
+
+    protected String getHeadlineUnsafe(String ticketId) {
         Promise<Issue> issue = getRestClient().getIssueClient().getIssue(ticketId);
         return issue.claim().getSummary();
     }
