@@ -34,10 +34,12 @@ dependencies {
 }
 
 def generatedResources = "$buildDir/generated-resources/main"
+def pkgName = "com.github.ocroquette.commithook"
+def pkgPath = pkgName.replace(".", "/")
 
 sourceSets {
     main {
-        output.dir(generatedResources, builtBy: 'generateJiraConfiguration')
+        output.dir(generatedResources, builtBy: 'generateResources')
     }
 }
 
@@ -54,12 +56,15 @@ jar {
     }
 }
 
-task generateJiraConfiguration {
+task generateResources {
+    dependsOn "generateProperties"
+    group "build"
+}
+
+task generateProperties {
     description "Generate the property file with the configuration to access the Jira server"
     group "build"
     doLast {
-        def pkgName = "com.github.ocroquette.commithook"
-        def pkgPath = pkgName.replace(".", "/")
         def propertyNames = [
                 "jiraUrl",
                 "jiraUser",
@@ -87,10 +92,10 @@ task generateJiraConfiguration {
     }
 }
 
-def generateMD5( File file ) {
+def generateMD5(File file) {
     def digest = java.security.MessageDigest.getInstance("MD5")
-    file.eachByte( 4096 ) { buffer, length ->
-        digest.update( buffer, 0, length )
+    file.eachByte(4096) { buffer, length ->
+        digest.update(buffer, 0, length)
     }
     new BigInteger(1, digest.digest()).toString(16).padLeft(32, '0')
 }
@@ -100,33 +105,59 @@ task createShellScript {
     dependsOn "jar"
     description "Create a shell script that contains the JAR file and extracts it on the first execution"
     doLast {
-        def jarFile = new File("build/libs/git-commit-hook.jar")
-
         // Print MD5 of JAR file on the console to have some kind of traceability
+        def jarFile = new File("build/libs/git-commit-hook.jar")
         println "MD5 of JAR file: " + generateMD5(jarFile)
 
-        def base64 = jarFile.bytes.encodeBase64().toString().split("(?<=\\G.{100})").join("\n")
+        def base64Jar = jarFile.bytes.encodeBase64().toString().split("(?<=\\G.{100})").join("\n")
         def outputJar = "commit-msg.jar"
-        new File("build/commit-msg").text = """#!/bin/sh
+        def outputTruststore = "truststore"
+        // -Djavax.net.debug=all -Djavax.net.ssl.trustStorePassword=changeit
+        def trustStoreSupport = project.hasProperty("trustStoreSupport") &&
+                project.hasProperty("jiraUrl") &&
+                project.property("jiraUrl").toLowerCase().startsWith("https")
+
+        def cmdLine
+        if(trustStoreSupport) {
+            cmdLine = "java  -Djavax.net.ssl.trustStore=\"`dirname \$0`/$outputTruststore\" -jar \"`dirname \$0`/$outputJar\" \"\$@\""
+        }
+        else {
+            cmdLine = "java  -jar \"`dirname \$0`/$outputJar\" \"\$@\""
+        }
+
+        def shellScript = """#!/bin/sh
 
 JAR="`dirname \$0`/$outputJar"
-
-# Extract the JAR
 echo "Extracting $outputJar"
-awk '/^__BASE64__/ { P=1 ; next } { if ( P==1 ) print \$0 }' \$0 | base64 --decode > "\$JAR"
-
+awk '/^__BASE64_JAR_START__/ { P=1 ; next } /^__BASE64_JAR_END__/ { P=0 ; next } { if ( P==1 ) print \$0 }' \$0 | base64 --decode > "\$JAR"
+"""
+        if (trustStoreSupport) {
+            shellScript += """
+TRUSTSTORE="`dirname \$0`/$outputTruststore"
+echo "Extracting $outputTruststore"
+awk '/^__BASE64_TS_START__/ { P=1 ; next } /^__BASE64_TS_END__/ { P=0 ; next } { if ( P==1 ) print \$0 }' \$0 | base64 --decode > "\$TRUSTSTORE"
+"""
+        }
+        shellScript += """
 # Replace the extracting script by the starting script
 (
     echo "#!/bin/sh"
-    echo 'java -jar "`dirname \$0`/$outputJar" "\$@"'
+    echo '$cmdLine'
 ) > "\$0.tmp"
 mv "\$0.tmp" "\$0"
 chmod +x "\$0"
-java -jar "`dirname \$0`/$outputJar" "\$@"
+$cmdLine
 
 exit 0
+"""
+        shellScript += "__BASE64_JAR_START__\n$base64Jar\n__BASE64_JAR_END__\n"
+        if(trustStoreSupport) {
+            File truststore = new File("$buildDir/truststore")
+            new CertificatesDownloader().downloadToTruststore(new URI(project.property("jiraUrl")).getHost(), 443, truststore)
+            def base64Ts = truststore.bytes.encodeBase64().toString().split("(?<=\\G.{100})").join("\n")
+            shellScript += "__BASE64_TS_START__\n$base64Ts\n__BASE64_TS_END__\n"
+        }
 
-__BASE64__
-""" + base64
+        new File("build/commit-msg").text = shellScript
     }
 }

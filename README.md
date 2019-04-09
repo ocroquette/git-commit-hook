@@ -146,6 +146,8 @@ Follow parameters are supported:
 * jiraUser: the user name to authenticate against the Jira server
 * jiraPassword: the password of the Jira user
 * wrapLength: the length of the lines for word wrapping (default is 79)
+* trustStoreSupport: see below
+
 
 This will generate the ```build/commit-msg``` shell script, which has two functions: extract the embedded JAR file on the first execution, and start the JAR on every execution. Put this script in your Git repository in the subdirectory ```.git/hooks```:
 
@@ -154,3 +156,11 @@ cp  build/commit-msg  <repopath>/.git/hooks/
 ```
 
 The password is stored within the hook. You should use a dedicated, read-only Jira account. It needs the "Browse project" permission for all relevant projects.
+
+# SSL Certificates
+
+If you use an internal Jira server over HTTPS in your organisation, chances are that the 
+certificates are not trusted by the standard certificate authorities provided by the Java
+distribution.
+In this case, just define the project property "trustStoreSupport". The build script will
+fetch the current certificates from the Jira server and embed them in the shell script.
