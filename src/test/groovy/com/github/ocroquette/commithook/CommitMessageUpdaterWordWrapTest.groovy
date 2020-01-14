@@ -93,6 +93,21 @@ Change-Id: Iee5559fbee98decbf54b03509e72a6fc1a0d24e6
 """)
     }
 
+    def "New Test"() {
+        given:
+        String input = this.getClass().getResource( '/commit-message-17.txt' ).text
+        CommitMessage cm = new CommitMessage(input)
+        when:
+        createInstance().update(cm)
+        def lines = cm.getTextLines()
+        then:
+        TestHelper.compareLines(lines,
+                """First line
+
+  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.h
+""")
+    }
+
     def createInstance() {
         return new CommitMessageUpdaterWordWrap(new CommitMessageUpdaterWordWrap.WordWrapSettings(72));
     }

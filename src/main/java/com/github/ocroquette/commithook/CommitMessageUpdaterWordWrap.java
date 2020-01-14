@@ -21,7 +21,6 @@ public class CommitMessageUpdaterWordWrap implements CommitMessageUpdater {
     private static final Set<Character> SEPARATORS = new HashSet<Character>(Arrays.asList(
             new Character[] {
                     ',',
-                    '.',
                     ':',
                     ';',
                     ' ',
@@ -91,7 +90,11 @@ public class CommitMessageUpdaterWordWrap implements CommitMessageUpdater {
         List<Integer> breakPoints = new ArrayList<>();
 
         boolean inLink = false;
-        for(int i = 1; i < s.length() ; i++) {
+        int i = 1;
+        while(Character.isWhitespace(s.charAt(i)) && i < s.length()) {
+            i++;
+        }
+        for(; i < s.length() ; i++) {
             if(s.substring(i).matches(LINK_PREFIX)) {
                 inLink = true;
                 continue;
