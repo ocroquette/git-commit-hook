@@ -93,9 +93,9 @@ Change-Id: Iee5559fbee98decbf54b03509e72a6fc1a0d24e6
 """)
     }
 
-    def "New Test"() {
+    def "Word wrap commit-message-leading-spaces-and-dot.txt"() {
         given:
-        String input = this.getClass().getResource( '/commit-message-17.txt' ).text
+        String input = this.getClass().getResource( '/commit-message-leading-spaces-and-dot.txt' ).text
         CommitMessage cm = new CommitMessage(input)
         when:
         createInstance().update(cm)
