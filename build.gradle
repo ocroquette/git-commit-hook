@@ -6,31 +6,39 @@
  * user guide available at https://docs.gradle.org/4.2.1/userguide/tutorial_java_projects.html
  */
 
-// Apply the java plugin to add support for Java
-apply plugin: 'java'
+plugins {
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
+    id 'java'
+    id 'groovy'
+    id 'application'
+}
 
-// For spock:
-apply plugin: "groovy"
-
-// Apply the application plugin to add support for building an application
-apply plugin: 'application'
-
-// In this section you declare where to find the dependencies of your project
 repositories {
-    // Use jcenter for resolving your dependencies.
-    // You can declare any Maven/Ivy/file repository here.
-    jcenter()
+    mavenCentral()
+    maven {
+        url "https://packages.atlassian.com/maven/repository/public"
+    }
 }
 
 dependencies {
-    compile "com.atlassian.jira:jira-rest-java-client-core:4.0.0"
-    compile "com.atlassian.fugue:fugue:2.2.1" // Dependency of jira-rest-java-client-core
-    compile "org.slf4j:slf4j-simple:1.7.25"
+    implementation 'com.atlassian.jira:jira-rest-java-client-core:5.2.2'
+    implementation 'com.atlassian.util.concurrent:atlassian-util-concurrent:3.0.0'
+    implementation "org.slf4j:slf4j-simple:1.7.35"
 
-    testCompile "org.spockframework:spock-core:1.1-groovy-2.4"
-    testCompile "org.hamcrest:hamcrest-core:1.3" // only necessary if Hamcrest matchers are used
-    testRuntime "net.bytebuddy:byte-buddy:1.6.5" // allows mocking of classes (in addition to interfaces)
-    testRuntime "org.objenesis:objenesis:2.5.1"  // allows mocking of classes without default constructor
+    testImplementation gradleTestKit()
+    testImplementation platform("org.spockframework:spock-bom:2.0-groovy-3.0")
+    testImplementation "org.spockframework:spock-core"
+    testImplementation "org.spockframework:spock-junit4"  // for old JUnit 4 rules
+    testImplementation "org.hamcrest:hamcrest-core:1.3" // only necessary if Hamcrest matchers are used
+    testImplementation "net.bytebuddy:byte-buddy:1.6.5" // allows mocking of classes (in addition to interfaces)
+    testImplementation "org.objenesis:objenesis:2.5.1"  // allows mocking of classes without default constructor
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
 }
 
 def generatedResources = "$buildDir/generated-resources/main"
@@ -43,17 +51,8 @@ sourceSets {
     }
 }
 
-jar {
-    manifest {
-        attributes "Main-Class": "com.github.ocroquette.commithook.Main"
-    }
-
-    from {
-        // We want the JAR to contain all dependencies (fat JAR)
-        configurations.compile.collect {
-            it.isDirectory() ? it : zipTree(it)
-        }
-    }
+application {
+    mainClass.set("com.github.ocroquette.commithook.Main")
 }
 
 task generateResources {
@@ -102,7 +101,7 @@ def generateMD5(File file) {
 
 task createShellScript {
     group "Custom"
-    dependsOn "jar"
+    dependsOn "shadowJar"
     description "Create a shell script that contains the JAR file and extracts it on the first execution"
     doLast {
         // Print MD5 of JAR file on the console to have some kind of traceability

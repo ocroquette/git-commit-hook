@@ -4,8 +4,6 @@ import com.github.ocroquette.commithook.CommitMessage
 import spock.lang.Specification
 
 class CommitMessageTest extends Specification {
-    static final String EOL = System.getProperty("line.separator");
-
     def "Parse commit-message-1.txt"() {
         given:
         String input = this.getClass().getResource( '/commit-message-1.txt' ).text
