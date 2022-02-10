@@ -110,7 +110,7 @@ task createShellScript {
     description "Create a shell script that contains the JAR file and extracts it on the first execution"
     doLast {
         // Print MD5 of JAR file on the console to have some kind of traceability
-        def jarFile = new File("build/libs/git-commit-hook.jar")
+        def jarFile = new File("build/libs/git-commit-hook-all.jar")
         println "MD5 of JAR file: " + generateMD5(jarFile)
 
         def base64Jar = jarFile.bytes.encodeBase64().toString().split("(?<=\\G.{100})").join("\n")
