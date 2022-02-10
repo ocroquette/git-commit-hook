@@ -68,7 +68,9 @@ public class Main {
         return new CommitMessageUpdaterJira.JiraSettings(
                 jiraUri,
                 properties.getProperty("jiraUser"),
-                properties.getProperty("jiraPassword"));
+                properties.getProperty("jiraPassword"),
+                properties.getProperty("jiraMultiTicketHeadlineSuffix")
+        );
     }
 
     static CommitMessageUpdaterWordWrap.WordWrapSettings getWordWrapSettings() throws URISyntaxException {

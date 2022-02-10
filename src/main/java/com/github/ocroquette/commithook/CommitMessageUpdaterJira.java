@@ -24,15 +24,17 @@ import java.util.List;
  */
 public class CommitMessageUpdaterJira implements CommitMessageUpdater {
     static public class JiraSettings {
-        JiraSettings(URI uri, String username, String password) {
+        JiraSettings(URI uri, String username, String password, String multiTicketHeadlineSuffix) {
             this.uri = uri;
             this.username = username;
             this.password = password;
+            this.multiTicketHeadlineSuffix = multiTicketHeadlineSuffix;
         }
 
         public final URI uri;
         public final String username;
         public final String password;
+        public final String multiTicketHeadlineSuffix;
     }
 
     private JiraRestClient restClient;
@@ -58,7 +60,10 @@ public class CommitMessageUpdaterJira implements CommitMessageUpdater {
 
         int insertAt = 0;
         if (ticketIds.size() > 1) {
-            commitMessage.getTextLines().add(0, "Issues " + String.join(" ", ticketIds));
+            String suffix = ( jiraSettings.multiTicketHeadlineSuffix != null &&
+                    ! jiraSettings.multiTicketHeadlineSuffix.isEmpty() ?
+                    " " + jiraSettings.multiTicketHeadlineSuffix : "");
+            commitMessage.getTextLines().add(0, String.join(" ", ticketIds) + suffix);
             commitMessage.getTextLines().add(1, "");
             insertAt = 2;
         }

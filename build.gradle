@@ -21,7 +21,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.atlassian.jira:jira-rest-java-client-core:5.2.2'
+    implementation 'com.atlassian.jira:jira-rest-java-client-app:5.2.2'
     implementation 'com.atlassian.util.concurrent:atlassian-util-concurrent:3.0.0'
     implementation "org.slf4j:slf4j-simple:1.7.35"
 
@@ -73,6 +73,7 @@ task generateProperties {
                 "jiraUrl",
                 "jiraUser",
                 "jiraPassword",
+                "jiraMultiTicketHeadlineSuffix",
                 "wrapLength"
         ]
         def propertyFile = file(generatedResources + "/" + pkgPath + "/settings.properties")

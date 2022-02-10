@@ -43,7 +43,32 @@ class CommitMessageUpdaterJiraTest extends Specification {
         createInstance().update(cm)
         then:
         cm.getTextLines() == [
-                "Issues ABC-999 JIRAPROJ-7890 SANDBOX-123 SANDBOX-456",
+                "ABC-999 JIRAPROJ-7890 SANDBOX-123 SANDBOX-456",
+                "",
+                "ABC-999       Headline of ABC-999",
+                "JIRAPROJ-7890 Headline of JIRAPROJ-7890",
+                "SANDBOX-123   Headline of SANDBOX-123",
+                "SANDBOX-456   Headline of SANDBOX-456",
+                "",
+                "Some comments after the tickets"
+        ]
+        cm.getFooterLines() == [
+                "Jira-Id: ABC-999",
+                "Jira-Id: JIRAPROJ-7890",
+                "Jira-Id: SANDBOX-123",
+                "Jira-Id: SANDBOX-456"
+        ]
+    }
+
+    def "Multiple issues with suffix"() {
+        given:
+        String input = this.getClass().getResource('/commit-message-6.txt').text
+        CommitMessage cm = new CommitMessage(input)
+        when:
+        createInstance("WIP").update(cm)
+        then:
+        cm.getTextLines() == [
+                "ABC-999 JIRAPROJ-7890 SANDBOX-123 SANDBOX-456 WIP",
                 "",
                 "ABC-999       Headline of ABC-999",
                 "JIRAPROJ-7890 Headline of JIRAPROJ-7890",
@@ -68,7 +93,7 @@ class CommitMessageUpdaterJiraTest extends Specification {
         createInstance().update(cm)
         then:
         cm.getTextLines() == [
-                "Issues ABC-999 JIRAPROJ-7890 SANDBOX-123 SANDBOX-456",
+                "ABC-999 JIRAPROJ-7890 SANDBOX-123 SANDBOX-456",
                 "",
                 "ABC-999       Headline of ABC-999",
                 "JIRAPROJ-7890 Headline of JIRAPROJ-7890",
@@ -119,8 +144,8 @@ class CommitMessageUpdaterJiraTest extends Specification {
 
     }
 
-    def createInstance() {
-        return new CommitMessageUpdaterJira(new CommitMessageUpdaterJira.JiraSettings(null, null, null)) {
+    def createInstance(String multiTicketHeadlineSuffix=null) {
+        return new CommitMessageUpdaterJira(new CommitMessageUpdaterJira.JiraSettings(null, null, null, multiTicketHeadlineSuffix)) {
             @Override
             protected String getHeadline(String ticketId) {
                 return "Headline of " + ticketId;
@@ -129,7 +154,7 @@ class CommitMessageUpdaterJiraTest extends Specification {
     }
 
     def createBrokenInstance() {
-        return new CommitMessageUpdaterJira(new CommitMessageUpdaterJira.JiraSettings(null, null, null)) {
+        return new CommitMessageUpdaterJira(new CommitMessageUpdaterJira.JiraSettings(null, null, null, null)) {
             @Override
             protected String getHeadlineUnsafe(String ticketId) {
                 throw new RuntimeException("Fake error while retrieving: " + ticketId)
