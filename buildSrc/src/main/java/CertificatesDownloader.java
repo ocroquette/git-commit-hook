@@ -27,7 +27,7 @@ public class CertificatesDownloader {
 
         log(hostname);
 
-        KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+        KeyStore ks = KeyStore.getInstance("JKS");
         ks.load(null, passphrase);
 
         SSLContext context = SSLContext.getInstance("TLS");
